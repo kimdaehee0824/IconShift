@@ -1,0 +1,37 @@
+# Build artifacts
+.build/
+*.o
+*.swiftmodule
+
+# App bundle output
+/dist/
+*.app
+
+# Xcode
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+DerivedData/
+.swiftpm/
+
+# Signing / secrets (never commit certificates or keys)
+*.p12
+*.pem
+*.cer
+signing/
+
+# Tuist (generated project — only Project.swift/Tuist.swift are committed)
+*.xcodeproj
+*.xcworkspace
+Derived/
+.tuist/
+Tuist/.build/
+
+# OMC operational state (not part of the project)
+.omc/
+
+# Local exploration & QA artifacts (not shipped)
+spike/
+samples/
+
+# macOS
+.DS_Store
