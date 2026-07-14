@@ -38,7 +38,10 @@ struct AppDetailView: View {
         HStack(spacing: 16) {
             Image(nsImage: InstalledAppsScanner.icon(forApp: rule.appPath))
                 .resizable()
-                .frame(width: 64, height: 64)
+                // App icon bitmaps carry ~10% built-in transparent margin; oversize
+                // and trim it so the visible edge lines up with the content below.
+                .frame(width: 76, height: 76)
+                .padding(-6)
             VStack(alignment: .leading, spacing: 4) {
                 Text(rule.displayName).font(.title2).bold()
                 Text(rule.appPath)
@@ -104,7 +107,6 @@ struct AppDetailView: View {
                 onPick: { model.setIcon(id: rule.id, variant: .dark, from: $0) },
                 onClear: { model.clearIcon(id: rule.id, variant: .dark) }
             )
-            Spacer()
         }
     }
 

@@ -40,7 +40,8 @@ struct IconWell: View {
                 .foregroundStyle(.secondary)
             }
         }
-        .frame(width: 168, height: 168)
+        .frame(minWidth: 168, maxWidth: .infinity)
+        .frame(height: 168)
         .dropDestination(for: URL.self) { urls, _ in
             guard let url = urls.first else { return false }
             onPick(url)
