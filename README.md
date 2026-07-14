@@ -1,111 +1,53 @@
 # IconShift
 
-A tiny macOS menu-bar app that **automatically swaps app icons when you switch between Light and Dark mode.**
+> [English](README.md), [한국어](README_ko.md), [日本語](README_jp.md)
 
-macOS has no built-in way to give an app two Finder/Dock icons — one for Light appearance and one for Dark. IconShift adds exactly that: assign a light icon and a dark icon to any app, and it re-applies the right one whenever the system appearance changes.
+IconShift is a small macOS menu bar app that changes app icons to match Light and Dark Mode. Give an app one icon for each appearance and IconShift keeps the Finder and Dock icon in sync as the system appearance changes.
 
-> Works great for Safari/Chrome web apps (PWAs) whose stock icons don't fit a dark menu bar or Dock.
+It is especially useful for Safari and Chrome web apps whose icons were designed for only one background.
 
 ## Features
 
-- 🌗 **Automatic light/dark icon switching** — the core feature.
-- 📌 **Per-app mode** — follow the system automatically, or pin an app to always-light / always-dark.
-- 🔍 **Search** your configured apps, and search installed apps when adding new ones.
-- 🖼️ **Drag & drop** a `.png`/`.icns` onto a slot, or pick a file.
-- 🧭 **Menu-bar first, or invisible** — run with a menu-bar icon, or hide it entirely and keep IconShift alive purely in the background.
-- 🚀 **Launch at login** (via `SMAppService`).
-- ♻️ **Self-healing** — re-applies icons on launch, recovering from PWA/browser updates that reset them.
-- 🛟 **Safe** — a failed write never corrupts an app's existing icon (see [How it works](#how-it-works)).
+- **Automatic switching** — Uses the Light or Dark icon that matches the current system appearance.
+- **Per-app control** — Follow the system or keep an app on Always Light or Always Dark.
+- **Simple icon setup** — Drop a PNG or ICNS file into each icon slot.
+- **Launch at login** — Starts quietly after you sign in so icons stay in sync.
+- **Optional menu bar icon** — Hide the icon while IconShift continues running in the background.
+- **PWA recovery** — Reapplies icons when IconShift starts, including icons reset by a browser update.
 
 ## Requirements
 
-- macOS 14 or later
-- Xcode / Swift toolchain
-- [Tuist](https://tuist.dev) for the Xcode project — `mise install` (a `.mise.toml` is provided) or `brew install tuist`. Optional if you only use the CLI build.
+| | Requirement |
+| --- | --- |
+| macOS | 14 or later |
+| Mac | Apple silicon or Intel |
 
-## Develop in Xcode (Tuist)
+You do not need Xcode or any developer tools to use IconShift.
 
-The Xcode project is generated with [Tuist](https://tuist.dev); only `Project.swift` is
-committed — never the `.xcodeproj` (it's git-ignored).
+## Install
 
-```bash
-tuist generate        # generates IconShift.xcworkspace and opens it in Xcode
-```
+1. Download the latest `IconShift-<version>.zip` from [GitHub Releases](https://github.com/kimdaehee0824/IconShift/releases).
+2. Unzip it and move `IconShift.app` to the Applications folder.
+3. Open IconShift once. The current release uses ad-hoc signing, so macOS may block the first launch. After trying to open it, go to **System Settings > Privacy & Security**, scroll to **Security**, click **Open Anyway**, then confirm **Open**.
+4. When IconShift first changes an app icon, allow **App Management** access. If the prompt was dismissed, go to **System Settings > Privacy & Security > App Management** and enable IconShift.
 
-Pick the **IconShift** scheme and press **Cmd+R**. This runs the real signed `.app`
-(menu bar, permissions, and login item all behave correctly — unlike running a bare
-SwiftPM executable).
-
-> **Signing:** ad-hoc by default, so it builds with zero setup. Because an ad-hoc
-> signature changes every build, the macOS App Management grant resets each run.
-> For a grant that *persists* across rebuilds, run `scripts/make-signing-cert.sh`
-> once, then set the identity to **IconShift Self-Signed** in
-> Xcode › Signing & Capabilities.
-
-## Build a distributable .app (CLI)
-
-```bash
-scripts/make-signing-cert.sh   # optional: stable signing identity (see above)
-scripts/build.sh               # assembles dist/IconShift.app
-open dist/IconShift.app
-```
-
-`swift build` also works for a plain compile.
-
-## Grant "App Management" permission
-
-Changing another app's icon requires macOS's **App Management** permission (this is a hard OS requirement, not an IconShift setting). On first use:
-
-1. Add an app and assign it an icon.
-2. macOS shows a prompt — click **Allow**. If you miss it, open
-   **System Settings › Privacy & Security › App Management** and enable **IconShift**.
-3. Hit **Apply Now** (or just toggle appearance).
-
-IconShift shows a banner and an "Open Settings" button whenever a write is blocked.
+Until releases use Developer ID signing and notarization, macOS may ask you to repeat the security or App Management approval after an IconShift update.
 
 ## Usage
 
-1. Click **+** and pick an app.
-2. Drop a **Light** icon and a **Dark** icon onto the two slots.
-3. Leave **Follow system appearance** on for automatic switching, or turn it off to pin one icon.
+1. Open IconShift and click **Add App** in the sidebar.
+2. Choose an installed app, then drop an image into the **Light Icon** and **Dark Icon** slots.
+3. Leave **Follow system appearance** enabled for automatic switching. Turn it off to choose **Always Light** or **Always Dark**.
+4. Use **Apply Now** whenever you want to reapply the selected icon immediately.
 
-> **Dock note:** the Finder icon updates immediately. An app that is *already running* keeps its old Dock tile until you quit and relaunch it — this is how the macOS Dock works, not an IconShift bug.
+Open **Settings > General** to control **Launch at Login** and **Show Menu Bar Icon**. If you hide the menu bar icon, launch IconShift again whenever you want to reopen its window. **Settings > About** shows the installed version and license.
 
-Icons and config live in `~/Library/Application Support/IconShift/` (config.json, icons/, iconshift.log).
-
-## How it works
-
-- **Appearance detection** — KVO on `NSApp.effectiveAppearance` (primary), the
-  `AppleInterfaceThemeChangedNotification` distributed notification (backup), and a
-  10-second poll (safety net). Icons are only re-applied when the mode actually changes.
-- **Applying icons** — `NSWorkspace.setIcon(_:forFile:)`. On apps registered in
-  protected locations (`/Applications`, `~/Applications`) macOS gates this behind
-  **App Management**, which is why IconShift must be code-signed and granted permission.
-- **Crash/partial-write safety** — a failed `setIcon` can leave the FinderInfo
-  custom-icon bit set without icon data, which shows a blank/generic icon. IconShift
-  detects and rolls this back so a failure never damages the original icon.
-
-## Project layout
-
-```
-Sources/IconShift/
-  main.swift, AppDelegate.swift          # AppKit shell (agent lifecycle)
-  StatusItemController.swift             # menu-bar item + menu
-  MainWindowController.swift             # hosts the SwiftUI window
-  AppModel.swift                         # state + orchestration
-  Models.swift                           # data types
-  Services/                              # appearance, icon writing, config, scan, login, log
-  Views/                                 # SwiftUI: sidebar, detail, icon well, add sheet
-Project.swift                            # Tuist manifest (generates the Xcode project)
-Package.swift                            # SwiftPM manifest (CLI builds)
-scripts/                                 # build + signing helpers
-Resources/Info.plist
-```
+Finder updates immediately. If the target app is already running, its old Dock tile remains until you quit and reopen that app; this is normal macOS behavior. IconShift also reapplies configured icons when it starts, which helps restore PWA icons after Safari or Chrome updates.
 
 ## Contributing
 
-Issues and PRs welcome. Keep it small and dependency-free.
+Development and contribution instructions are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-[MIT](LICENSE) © 2026 IconShift Contributors
+IconShift is available under the [MIT License](LICENSE).
