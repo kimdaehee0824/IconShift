@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Creates a stable self-signed code-signing identity named "EasyIcon Self-Signed"
-# in your login keychain. Signing EasyIcon with a *stable* identity means the
+# Creates a stable self-signed code-signing identity named "IconShift Self-Signed"
+# in your login keychain. Signing IconShift with a *stable* identity means the
 # macOS "App Management" permission you grant it survives rebuilds (an ad-hoc
 # signature changes every build and resets the grant).
 #
@@ -10,7 +10,7 @@
 # committed to the repo.
 set -euo pipefail
 
-NAME="EasyIcon Self-Signed"
+NAME="IconShift Self-Signed"
 KEYCHAIN="$HOME/Library/Keychains/login.keychain-db"
 
 if security find-identity -v -p codesigning | grep -q "$NAME"; then
@@ -41,10 +41,10 @@ openssl req -x509 -newkey rsa:2048 -nodes \
 
 openssl pkcs12 -export \
     -inkey "$TMP/key.pem" -in "$TMP/cert.pem" \
-    -out "$TMP/identity.p12" -passout pass:easyicon -name "$NAME"
+    -out "$TMP/identity.p12" -passout pass:iconshift -name "$NAME"
 
 echo "==> Importing into login keychain (may prompt for your password)"
-security import "$TMP/identity.p12" -k "$KEYCHAIN" -P easyicon \
+security import "$TMP/identity.p12" -k "$KEYCHAIN" -P iconshift \
     -T /usr/bin/codesign -T /usr/bin/security
 
 # Let codesign use the private key without an interactive prompt each build.

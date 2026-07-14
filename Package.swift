@@ -2,14 +2,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "EasyIcon",
+    name: "IconShift",
     platforms: [
         .macOS(.v14)
     ],
     targets: [
         .executableTarget(
-            name: "EasyIcon",
-            path: "Sources/EasyIcon"
+            name: "IconShift",
+            path: "Sources/IconShift"
         )
     ]
 )

@@ -1,17 +1,17 @@
 import Foundation
 
-final class EasyLogger: @unchecked Sendable {
-    static let shared = EasyLogger()
+final class AppLogger: @unchecked Sendable {
+    static let shared = AppLogger()
 
     let fileURL: URL
-    private let queue = DispatchQueue(label: "com.easyicon.logger")
+    private let queue = DispatchQueue(label: "com.iconshift.logger")
 
     private init() {
         let base = FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("EasyIcon", isDirectory: true)
+            .appendingPathComponent("IconShift", isDirectory: true)
         try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
-        fileURL = base.appendingPathComponent("easyicon.log")
+        fileURL = base.appendingPathComponent("iconshift.log")
     }
 
     func log(_ message: String) {

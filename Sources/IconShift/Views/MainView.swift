@@ -23,6 +23,14 @@ struct MainView: View {
                 }
             }
             .frame(minWidth: 420)
+            // safeAreaInset here breaks NSToolbar bridging (title/toolbar collapse); overlay doesn't.
+            .overlay(alignment: .bottom) {
+                if model.permissionGranted == false {
+                    permissionBanner
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 14)
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .navigation) {
                     Button {
@@ -37,16 +45,11 @@ struct MainView: View {
                 }
             }
         }
-        .frame(minWidth: 760, minHeight: 460)
+        .frame(minWidth: 760, idealWidth: 880, minHeight: 460, idealHeight: 560)
         .onAppear {
             if selection == nil { selection = model.rules.first?.id }
         }
         .sheet(isPresented: $showingAdd) { AddAppSheet() }
-        .safeAreaInset(edge: .top) {
-            if model.permissionGranted == false {
-                permissionBanner
-            }
-        }
     }
 
     private var permissionBanner: some View {
@@ -57,15 +60,31 @@ struct MainView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("App Management permission required")
                     .font(.headline)
-                Text("EasyIcon can't change app icons until you allow it under Privacy & Security › App Management.")
+                Text("IconShift can't change app icons until you allow it under Privacy & Security › App Management.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            Spacer()
+            Spacer(minLength: 16)
             Button("Open Settings") { model.openAppManagementSettings() }
                 .buttonStyle(.borderedProminent)
         }
-        .padding(12)
-        .background(.orange.opacity(0.12))
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .frame(maxWidth: 640)
+        .modifier(FloatingBannerSurface())
+    }
+}
+
+private struct FloatingBannerSurface: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(macOS 26.0, *) {
+            content.glassEffect(.regular, in: .rect(cornerRadius: 16))
+        } else {
+            content
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(.separator.opacity(0.5)))
+                .shadow(color: .black.opacity(0.18), radius: 12, y: 4)
+        }
     }
 }

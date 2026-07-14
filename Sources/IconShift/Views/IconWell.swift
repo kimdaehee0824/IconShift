@@ -5,6 +5,7 @@ struct IconWell: View {
     let title: LocalizedStringKey
     let subtitle: LocalizedStringKey
     let image: NSImage?
+    let placeholder: NSImage?
     let isActive: Bool
     let onPick: (URL) -> Void
     let onClear: () -> Void
@@ -31,6 +32,17 @@ struct IconWell: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .padding(16)
+            } else if let placeholder {
+                VStack(spacing: 8) {
+                    Image(nsImage: placeholder)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 76, height: 76)
+                        .grayscale(1)
+                        .opacity(0.4)
+                    Text("Keeps original icon").font(.caption)
+                }
+                .foregroundStyle(.secondary)
             } else {
                 VStack(spacing: 6) {
                     Image(systemName: "plus.viewfinder").font(.largeTitle)

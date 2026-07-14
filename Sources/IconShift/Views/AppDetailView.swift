@@ -86,13 +86,16 @@ struct AppDetailView: View {
     }
 
     private func iconsSection(_ rule: AppIconRule) -> some View {
-        let active = model.activeIconFileName(for: rule)
+        let original = InstalledAppsScanner.bundleIcon(forApp: rule.appPath)
+        let lightGoverns = rule.mode == .light || (rule.mode == .auto && model.appearance == .light)
+        let darkGoverns = rule.mode == .dark || (rule.mode == .auto && model.appearance == .dark)
         return HStack(alignment: .top, spacing: 28) {
             IconWell(
                 title: "Light Icon",
                 subtitle: "Shown in Light mode",
                 image: loadImage(rule.lightIconFileName),
-                isActive: rule.lightIconFileName != nil && active == rule.lightIconFileName,
+                placeholder: original,
+                isActive: rule.enabled && lightGoverns,
                 onPick: { model.setIcon(id: rule.id, variant: .light, from: $0) },
                 onClear: { model.clearIcon(id: rule.id, variant: .light) }
             )
@@ -100,7 +103,8 @@ struct AppDetailView: View {
                 title: "Dark Icon",
                 subtitle: "Shown in Dark mode",
                 image: loadImage(rule.darkIconFileName),
-                isActive: rule.darkIconFileName != nil && active == rule.darkIconFileName,
+                placeholder: original,
+                isActive: rule.enabled && darkGoverns,
                 onPick: { model.setIcon(id: rule.id, variant: .dark, from: $0) },
                 onClear: { model.clearIcon(id: rule.id, variant: .dark) }
             )
@@ -109,6 +113,6 @@ struct AppDetailView: View {
 
     private func loadImage(_ fileName: String?) -> NSImage? {
         guard let fileName else { return nil }
-        return NSImage(contentsOf: ConfigStore.shared.iconURL(fileName))
+        return ConfigStore.shared.iconImage(fileName)
     }
 }

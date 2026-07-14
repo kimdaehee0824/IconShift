@@ -1,17 +1,17 @@
 import ProjectDescription
 
 let project = Project(
-    name: "EasyIcon",
+    name: "IconShift",
     options: .options(defaultKnownRegions: ["en", "ko", "ja"], developmentRegion: "en"),
     targets: [
         .target(
-            name: "EasyIcon",
+            name: "IconShift",
             destinations: .macOS,
             product: .app,
-            bundleId: "com.easyicon.EasyIcon",
+            bundleId: "com.iconshift.IconShift",
             deploymentTargets: .macOS("14.0"),
             infoPlist: .file(path: "Resources/Info.plist"),
-            sources: ["Sources/EasyIcon/**"],
+            sources: ["Sources/IconShift/**"],
             resources: ["Resources/Localizable.xcstrings"],
             dependencies: [],
             settings: .settings(base: [

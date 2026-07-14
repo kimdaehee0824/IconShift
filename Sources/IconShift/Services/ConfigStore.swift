@@ -8,10 +8,12 @@ final class ConfigStore {
     let iconsURL: URL
     let configURL: URL
 
+    private let imageCache = NSCache<NSString, NSImage>()
+
     private init() {
         baseURL = FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("EasyIcon", isDirectory: true)
+            .appendingPathComponent("IconShift", isDirectory: true)
         iconsURL = baseURL.appendingPathComponent("icons", isDirectory: true)
         configURL = baseURL.appendingPathComponent("config.json")
         try? FileManager.default.createDirectory(at: iconsURL, withIntermediateDirectories: true)
@@ -42,19 +44,29 @@ final class ConfigStore {
                 try FileManager.default.removeItem(at: destination)
             }
             try FileManager.default.copyItem(at: url, to: destination)
+            // File names are deterministic, so a re-import must evict the stale image.
+            imageCache.removeObject(forKey: fileName as NSString)
             return fileName
         } catch {
-            EasyLogger.shared.log("Failed to import icon from \(url.path): \(error.localizedDescription)")
+            AppLogger.shared.log("Failed to import icon from \(url.path): \(error.localizedDescription)")
             return nil
         }
     }
 
     func removeIcon(fileName: String) {
         try? FileManager.default.removeItem(at: iconsURL.appendingPathComponent(fileName))
+        imageCache.removeObject(forKey: fileName as NSString)
     }
 
     func iconURL(_ fileName: String) -> URL {
         iconsURL.appendingPathComponent(fileName)
+    }
+
+    func iconImage(_ fileName: String) -> NSImage? {
+        if let cached = imageCache.object(forKey: fileName as NSString) { return cached }
+        guard let image = NSImage(contentsOf: iconURL(fileName)) else { return nil }
+        imageCache.setObject(image, forKey: fileName as NSString)
+        return image
     }
 
     func revealConfigInFinder() {

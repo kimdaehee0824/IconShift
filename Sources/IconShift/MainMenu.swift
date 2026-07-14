@@ -3,12 +3,16 @@ import AppKit
 @MainActor
 enum MainMenu {
     static func install() {
-        let appName = "EasyIcon"
+        let appName = "IconShift"
 
         let appMenu = NSMenu()
         appMenu.addItem(withTitle: String(format: NSLocalizedString("About %@", comment: ""), appName),
                         action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)),
                         keyEquivalent: "")
+        appMenu.addItem(.separator())
+        appMenu.addItem(withTitle: NSLocalizedString("Settings…", comment: ""),
+                        action: #selector(AppDelegate.showSettings(_:)),
+                        keyEquivalent: ",")
         appMenu.addItem(.separator())
         appMenu.addItem(withTitle: String(format: NSLocalizedString("Hide %@", comment: ""), appName),
                         action: #selector(NSApplication.hide(_:)),

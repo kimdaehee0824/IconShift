@@ -29,7 +29,7 @@ struct SidebarView: View {
             }
         }
         .searchable(text: $searchText, placement: .sidebar, prompt: "Search apps")
-        .navigationTitle("EasyIcon")
+        .navigationTitle("IconShift")
         .toolbar {
             ToolbarItem {
                 Button {

@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>EasyIcon</string>
+    <string>IconShift</string>
     <key>CFBundleDisplayName</key>
-    <string>EasyIcon</string>
+    <string>IconShift</string>
     <key>CFBundleIdentifier</key>
-    <string>com.easyicon.EasyIcon</string>
+    <string>com.iconshift.IconShift</string>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>CFBundleShortVersionString</key>
     <string>0.1.0</string>
     <key>CFBundleExecutable</key>
-    <string>EasyIcon</string>
+    <string>IconShift</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>LSMinimumSystemVersion</key>
@@ -21,7 +21,7 @@
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
     <key>NSHumanReadableCopyright</key>
-    <string>MIT License. Copyright (c) 2026 EasyIcon Contributors.</string>
+    <string>MIT License. Copyright (c) 2026 IconShift Contributors.</string>
     <!-- Menu-bar / background agent: no Dock icon by default. -->
     <key>LSUIElement</key>
     <true/>

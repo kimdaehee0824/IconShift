@@ -11,7 +11,7 @@ final class AppModel: ObservableObject {
 
     private let store = ConfigStore.shared
     private let monitor = AppearanceMonitor()
-    private let logger = EasyLogger.shared
+    private let logger = AppLogger.shared
 
     var onSettingsChanged: ((AppSettings) -> Void)?
 
@@ -61,12 +61,18 @@ final class AppModel: ObservableObject {
     private func applyRuleInternal(_ rule: AppIconRule) {
         guard rule.enabled else { return }
         guard let fileName = activeIconFileName(for: rule) else {
-            logger.log("No \(rule.mode.rawValue) icon set for \(rule.displayName); skipping")
+            // No icon for the current appearance means "use the original", so a stale custom icon can't linger.
+            _ = IconApplier.clearIcon(app: rule.appPath)
+            InstalledAppsScanner.invalidateIcon(forApp: rule.appPath)
+            logger.log("No \(rule.mode.rawValue) icon for \(rule.displayName); restored original icon")
             return
         }
         let result = IconApplier.apply(iconPath: store.iconURL(fileName).path, toApp: rule.appPath)
         logger.log(result.message)
         permissionGranted = result.success
+        if result.success {
+            InstalledAppsScanner.invalidateIcon(forApp: rule.appPath)
+        }
     }
 
     func addRule(for app: InstalledApp) {
@@ -82,6 +88,7 @@ final class AppModel: ObservableObject {
         guard let index = rules.firstIndex(where: { $0.id == id }) else { return }
         let rule = rules[index]
         _ = IconApplier.clearIcon(app: rule.appPath)
+        InstalledAppsScanner.invalidateIcon(forApp: rule.appPath)
         rule.lightIconFileName.map(store.removeIcon(fileName:))
         rule.darkIconFileName.map(store.removeIcon(fileName:))
         rules.remove(at: index)
@@ -100,6 +107,7 @@ final class AppModel: ObservableObject {
             applyRule(id: id)
         } else if let rule = rules.first(where: { $0.id == id }) {
             _ = IconApplier.clearIcon(app: rule.appPath)
+            InstalledAppsScanner.invalidateIcon(forApp: rule.appPath)
         }
     }
 
