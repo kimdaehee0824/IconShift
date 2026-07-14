@@ -160,10 +160,6 @@ final class AppModel: ObservableObject {
         onSettingsChanged?(settings)
     }
 
-    func revealConfig() {
-        store.revealConfigInFinder()
-    }
-
     func openAppManagementSettings() {
         PermissionManager.openAppManagementSettings()
     }

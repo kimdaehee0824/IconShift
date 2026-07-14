@@ -69,7 +69,4 @@ final class ConfigStore {
         return image
     }
 
-    func revealConfigInFinder() {
-        NSWorkspace.shared.activateFileViewerSelecting([configURL])
-    }
 }
