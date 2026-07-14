@@ -9,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Menu-bar / background agent: never show a Dock icon.
         NSApp.setActivationPolicy(.accessory)
+        MainMenu.install()
 
         model.refreshLoginItemStatus()
 

@@ -14,9 +14,15 @@ final class MainWindowController: NSObject, NSWindowDelegate {
     func show() {
         if window == nil {
             let hosting = NSHostingController(rootView: MainView().environmentObject(model))
+            hosting.sceneBridgingOptions = [.toolbars, .title]
             let window = NSWindow(contentViewController: hosting)
             window.title = "EasyIcon"
-            window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+            // .fullSizeContentView lets NavigationSplitView extend the sidebar to full
+            // height (Mail-style: toolbar only over the content columns); .unified is
+            // needed because a bare NSWindow resolves .automatic to .expanded
+            // (toolbar on its own row below the title).
+            window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
+            window.toolbarStyle = .unified
             window.setContentSize(NSSize(width: 880, height: 560))
             window.isReleasedWhenClosed = false
             window.delegate = self
