@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile
+        run: swift build
+
+      - name: Build app bundle
+        env:
+          ICONSHIFT_SIGN_ID: "-"
+        run: scripts/build.sh release
+
+      - name: Verify app bundle
+        run: |
+          set -euo pipefail
+          APP="dist/IconShift.app"
+          EXECUTABLE="$APP/Contents/MacOS/IconShift"
+
+          test -x "$EXECUTABLE"
+          test -s "$APP/Contents/Resources/ko.lproj/Localizable.strings"
+          test -s "$APP/Contents/Resources/ja.lproj/Localizable.strings"
+          test "$(plutil -extract CFBundleDevelopmentRegion raw "$APP/Contents/Info.plist")" = "en"
+
+          ARCHS="$(lipo -archs "$EXECUTABLE")"
+          [[ " $ARCHS " == *" arm64 "* ]]
+          [[ " $ARCHS " == *" x86_64 "* ]]
+          codesign --verify --strict --verbose=2 "$APP"
