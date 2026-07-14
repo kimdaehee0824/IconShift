@@ -7,7 +7,8 @@ final class AppearanceMonitor {
     var onChange: ((SystemAppearance) -> Void)?
 
     private var observation: NSKeyValueObservation?
-    private var timer: Timer?
+    private var themeTask: Task<Void, Never>?
+    private var pollTask: Task<Void, Never>?
 
     init() {
         current = AppearanceMonitor.read()
@@ -24,28 +25,32 @@ final class AppearanceMonitor {
     func start() {
         if let app = NSApp {
             observation = app.observe(\.effectiveAppearance, options: [.new]) { [weak self] _, _ in
+                MainActor.assumeIsolated { self?.evaluate() }
+            }
+        }
+
+        themeTask = Task { [weak self] in
+            let name = Notification.Name("AppleInterfaceThemeChangedNotification")
+            for await _ in DistributedNotificationCenter.default().notifications(named: name) {
+                guard (try? await Task.sleep(for: .seconds(0.3))) != nil else { break }
                 self?.evaluate()
             }
         }
 
-        DistributedNotificationCenter.default().addObserver(
-            forName: Notification.Name("AppleInterfaceThemeChangedNotification"),
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { self?.evaluate() }
-        }
-
-        timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
-            self?.evaluate()
+        pollTask = Task { [weak self] in
+            while (try? await Task.sleep(for: .seconds(10))) != nil {
+                self?.evaluate()
+            }
         }
     }
 
     func stop() {
         observation?.invalidate()
         observation = nil
-        timer?.invalidate()
-        timer = nil
+        themeTask?.cancel()
+        themeTask = nil
+        pollTask?.cancel()
+        pollTask = nil
     }
 
     private func evaluate() {

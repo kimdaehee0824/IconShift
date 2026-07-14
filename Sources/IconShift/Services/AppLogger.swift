@@ -1,6 +1,6 @@
 import Foundation
 
-final class AppLogger: @unchecked Sendable {
+nonisolated final class AppLogger: Sendable {
     static let shared = AppLogger()
 
     let fileURL: URL

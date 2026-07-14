@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
@@ -9,7 +9,12 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "IconShift",
-            path: "Sources/IconShift"
+            path: "Sources/IconShift",
+            swiftSettings: [
+                .defaultIsolation(MainActor.self),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances")
+            ]
         )
     ]
 )

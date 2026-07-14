@@ -19,7 +19,10 @@ let project = Project(
                 "CODE_SIGN_IDENTITY": "-",
                 "MARKETING_VERSION": "0.1.0",
                 "CURRENT_PROJECT_VERSION": "1",
-                "SWIFT_EMIT_LOC_STRINGS": "YES"
+                "SWIFT_EMIT_LOC_STRINGS": "YES",
+                "SWIFT_VERSION": "6.0",
+                "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
+                "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor"
             ])
         )
     ]
