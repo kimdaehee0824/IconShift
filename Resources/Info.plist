@@ -6,6 +6,8 @@
     <string>IconShift</string>
     <key>CFBundleDisplayName</key>
     <string>IconShift</string>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
     <key>CFBundleIdentifier</key>
     <string>com.iconshift.IconShift</string>
     <key>CFBundleVersion</key>
