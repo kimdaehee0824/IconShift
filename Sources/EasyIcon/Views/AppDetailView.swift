@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Per-app configuration: enable, mode (auto / fixed), and the two icon slots.
 struct AppDetailView: View {
     @EnvironmentObject private var model: AppModel
     let ruleID: AppIconRule.ID
@@ -38,8 +37,6 @@ struct AppDetailView: View {
         HStack(spacing: 16) {
             Image(nsImage: InstalledAppsScanner.icon(forApp: rule.appPath))
                 .resizable()
-                // App icon bitmaps carry ~10% built-in transparent margin; oversize
-                // and trim it so the visible edge lines up with the content below.
                 .frame(width: 76, height: 76)
                 .padding(-6)
             VStack(alignment: .leading, spacing: 4) {

@@ -1,23 +1,18 @@
 import AppKit
 import Combine
 
-/// The single source of truth: holds rules + settings, watches the system
-/// appearance, and applies icons. Shared between the AppKit shell and SwiftUI views.
 @MainActor
 final class AppModel: ObservableObject {
     @Published var rules: [AppIconRule] = []
     @Published var settings: AppSettings = AppSettings()
     @Published private(set) var appearance: SystemAppearance = .light
 
-    /// nil = unknown, true = last apply succeeded, false = last apply failed
-    /// (most likely the App Management permission has not been granted yet).
     @Published private(set) var permissionGranted: Bool?
 
     private let store = ConfigStore.shared
     private let monitor = AppearanceMonitor()
     private let logger = EasyLogger.shared
 
-    /// Lets the AppKit shell react to settings that affect it (menu bar icon).
     var onSettingsChanged: ((AppSettings) -> Void)?
 
     var logFileURL: URL { logger.fileURL }
@@ -28,8 +23,6 @@ final class AppModel: ObservableObject {
         settings = config.settings
         appearance = monitor.current
     }
-
-    // MARK: - Lifecycle
 
     func startMonitoring() {
         monitor.onChange = { [weak self] appearance in
@@ -45,9 +38,6 @@ final class AppModel: ObservableObject {
         settings.launchAtLogin = LoginItemManager.isEnabled
     }
 
-    // MARK: - Icon resolution & application
-
-    /// The icon file name that should currently be applied for a rule, if any.
     func activeIconFileName(for rule: AppIconRule) -> String? {
         switch rule.mode {
         case .auto:  return appearance == .dark ? rule.darkIconFileName : rule.lightIconFileName
@@ -71,15 +61,13 @@ final class AppModel: ObservableObject {
     private func applyRuleInternal(_ rule: AppIconRule) {
         guard rule.enabled else { return }
         guard let fileName = activeIconFileName(for: rule) else {
-            logger.log("No \(rule.mode.label) icon set for \(rule.displayName); skipping")
+            logger.log("No \(rule.mode.rawValue) icon set for \(rule.displayName); skipping")
             return
         }
         let result = IconApplier.apply(iconPath: store.iconURL(fileName).path, toApp: rule.appPath)
         logger.log(result.message)
         permissionGranted = result.success
     }
-
-    // MARK: - Rule CRUD
 
     func addRule(for app: InstalledApp) {
         guard !rules.contains(where: { $0.id == app.bundleIdentifier }) else { return }
@@ -145,8 +133,6 @@ final class AppModel: ObservableObject {
         mutate(&rules[index])
         persist()
     }
-
-    // MARK: - Settings
 
     func setShowMenuBarIcon(_ show: Bool) {
         settings.showMenuBarIcon = show

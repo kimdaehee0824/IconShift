@@ -1,15 +1,6 @@
 import AppKit
 
-/// Observes system light/dark appearance changes and reports transitions.
-///
-/// Detection strategy (most to least reliable):
-///  1. KVO on `NSApp.effectiveAppearance` — accurate as long as the app does not
-///     override its own appearance (EasyIcon does not).
-///  2. `AppleInterfaceThemeChangedNotification` distributed notification — a
-///     backup signal (undocumented but stable in practice).
-///  3. A periodic poll — a final safety net.
-///
-/// `onChange` fires only when the resolved appearance actually differs.
+// Detection order, most to least reliable: effectiveAppearance KVO → AppleInterfaceThemeChangedNotification → poll.
 final class AppearanceMonitor {
 
     private(set) var current: SystemAppearance
@@ -22,7 +13,6 @@ final class AppearanceMonitor {
         current = AppearanceMonitor.read()
     }
 
-    /// Reads the current appearance from the most reliable available source.
     static func read() -> SystemAppearance {
         if let app = NSApp,
            let name = app.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
@@ -43,7 +33,6 @@ final class AppearanceMonitor {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            // Give the global appearance state a moment to settle before reading.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { self?.evaluate() }
         }
 

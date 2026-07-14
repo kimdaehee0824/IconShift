@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Searchable picker of installed apps that aren't configured yet.
 struct AddAppSheet: View {
     @EnvironmentObject private var model: AppModel
     @Environment(\.dismiss) private var dismiss

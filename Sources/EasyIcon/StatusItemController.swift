@@ -1,7 +1,5 @@
 import AppKit
 
-/// Owns the menu-bar status item and its menu. Can be shown or hidden at runtime;
-/// when hidden, EasyIcon keeps running as a pure background agent.
 @MainActor
 final class StatusItemController: NSObject, NSMenuDelegate {
     private let model: AppModel
@@ -30,26 +28,28 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         }
     }
 
-    // Rebuilt on every open so the appearance line and toggle states stay current.
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
 
-        let header = NSMenuItem(title: "Appearance: \(model.appearance.label)", action: nil, keyEquivalent: "")
+        let header = NSMenuItem(
+            title: String(format: NSLocalizedString("Appearance: %@", comment: ""), model.appearance.label),
+            action: nil, keyEquivalent: ""
+        )
         header.isEnabled = false
         menu.addItem(header)
         menu.addItem(.separator())
 
-        addItem(to: menu, title: "Open EasyIcon…", action: #selector(openMain), key: "o")
-        addItem(to: menu, title: "Re-apply Now", action: #selector(reapply), key: "r")
-        addItem(to: menu, title: "Open Log", action: #selector(openLog), key: "")
+        addItem(to: menu, title: NSLocalizedString("Open EasyIcon…", comment: ""), action: #selector(openMain), key: "o")
+        addItem(to: menu, title: NSLocalizedString("Re-apply Now", comment: ""), action: #selector(reapply), key: "r")
+        addItem(to: menu, title: NSLocalizedString("Open Log", comment: ""), action: #selector(openLog), key: "")
         menu.addItem(.separator())
 
-        let login = addItem(to: menu, title: "Launch at Login", action: #selector(toggleLogin), key: "")
+        let login = addItem(to: menu, title: NSLocalizedString("Launch at Login", comment: ""), action: #selector(toggleLogin), key: "")
         login.state = model.settings.launchAtLogin ? .on : .off
 
-        addItem(to: menu, title: "Hide Menu Bar Icon", action: #selector(hideIcon), key: "")
+        addItem(to: menu, title: NSLocalizedString("Hide Menu Bar Icon", comment: ""), action: #selector(hideIcon), key: "")
         menu.addItem(.separator())
-        addItem(to: menu, title: "Quit EasyIcon", action: #selector(quit), key: "q")
+        addItem(to: menu, title: NSLocalizedString("Quit EasyIcon", comment: ""), action: #selector(quit), key: "q")
     }
 
     @discardableResult

@@ -1,6 +1,5 @@
 import AppKit
 
-/// Discovers installed macOS applications for the "add app" picker.
 enum InstalledAppsScanner {
     static let searchPaths: [String] = [
         "/Applications",

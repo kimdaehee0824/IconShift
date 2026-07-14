@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Root split-view: app list on the left, per-app icon configuration on the right.
 struct MainView: View {
     @EnvironmentObject private var model: AppModel
     @State private var selection: AppIconRule.ID?
@@ -23,7 +22,6 @@ struct MainView: View {
                     )
                 }
             }
-            // Two 168pt icon wells + 28pt spacing + 28pt outer padding on both sides.
             .frame(minWidth: 420)
             .toolbar {
                 ToolbarItem(placement: .navigation) {

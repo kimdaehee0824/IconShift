@@ -17,10 +17,6 @@ final class MainWindowController: NSObject, NSWindowDelegate {
             hosting.sceneBridgingOptions = [.toolbars, .title]
             let window = NSWindow(contentViewController: hosting)
             window.title = "EasyIcon"
-            // .fullSizeContentView lets NavigationSplitView extend the sidebar to full
-            // height (Mail-style: toolbar only over the content columns); .unified is
-            // needed because a bare NSWindow resolves .automatic to .expanded
-            // (toolbar on its own row below the title).
             window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
             window.toolbarStyle = .unified
             window.setContentSize(NSSize(width: 880, height: 560))
@@ -29,8 +25,7 @@ final class MainWindowController: NSObject, NSWindowDelegate {
             window.center()
             self.window = window
         }
-        // Act as a regular app while the window is open so it layers, activates, and
-        // participates in Stage Manager like a normal app (not a background agent).
+        // .regular only while the window is open (layering, activation, Stage Manager); .accessory on close.
         NSApp.setActivationPolicy(.regular)
         NSApp.activate()
         window?.makeKeyAndOrderFront(nil)

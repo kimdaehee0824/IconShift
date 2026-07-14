@@ -1,10 +1,9 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// A large icon slot that accepts a dropped image file or a file chosen via a panel.
 struct IconWell: View {
-    let title: String
-    let subtitle: String
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey
     let image: NSImage?
     let isActive: Bool
     let onPick: (URL) -> Void

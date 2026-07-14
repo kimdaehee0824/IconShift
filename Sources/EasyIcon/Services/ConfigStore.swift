@@ -1,9 +1,6 @@
 import AppKit
 
-/// Persists configuration and stores copies of user-selected icon files under
-/// ~/Library/Application Support/EasyIcon. This location avoids the TCC prompts
-/// triggered by Pictures/Desktop/Documents/Downloads, and keeps the config
-/// self-contained (icons survive the user moving or deleting the originals).
+// Stored under Application Support to avoid the TCC prompts of Pictures/Desktop/Documents/Downloads.
 final class ConfigStore {
     static let shared = ConfigStore()
 
@@ -35,7 +32,6 @@ final class ConfigStore {
         try? data.write(to: configURL, options: .atomic)
     }
 
-    /// Copies a user-chosen icon file into the store, returning the stored file name.
     func importIcon(from url: URL, bundleIdentifier: String, variant: String) -> String? {
         let ext = url.pathExtension.isEmpty ? "png" : url.pathExtension
         let safeID = bundleIdentifier.replacingOccurrences(of: "/", with: "_")

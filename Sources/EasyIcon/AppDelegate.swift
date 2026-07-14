@@ -7,7 +7,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var windowController: MainWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Menu-bar / background agent: never show a Dock icon.
         NSApp.setActivationPolicy(.accessory)
         MainMenu.install()
 
@@ -27,22 +26,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusController.setVisible(model.settings.showMenuBarIcon)
 
         model.startMonitoring()
-        // Re-apply on launch: recovers icons that were reset (e.g. a PWA/browser update).
+        // Re-apply on launch self-heals icons reset by a PWA/browser update.
         model.applyAll(reason: "launch")
 
-        // First run (no rules yet): open the window so the user can configure.
         if model.rules.isEmpty {
             windowController.show()
         }
     }
 
-    /// Re-launching the app (e.g. when the menu bar icon is hidden) reopens the window.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         windowController?.show()
         return true
     }
 
-    /// Keep running in the background after the window closes.
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         false
     }

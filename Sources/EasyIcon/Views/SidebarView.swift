@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Searchable list of configured apps.
 struct SidebarView: View {
     @EnvironmentObject private var model: AppModel
     @Binding var selection: AppIconRule.ID?

@@ -1,6 +1,5 @@
 import ServiceManagement
 
-/// Thin wrapper over `SMAppService` for launch-at-login registration (macOS 13+).
 enum LoginItemManager {
     static var isEnabled: Bool {
         SMAppService.mainApp.status == .enabled

@@ -1,7 +1,5 @@
 import Foundation
 
-/// Minimal append-only file logger. Writes to
-/// ~/Library/Application Support/EasyIcon/easyicon.log
 final class EasyLogger: @unchecked Sendable {
     static let shared = EasyLogger()
 
