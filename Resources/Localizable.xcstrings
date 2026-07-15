@@ -161,6 +161,22 @@
         }
       }
     },
+    "Choose File…" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルを選択…"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파일 선택…"
+          }
+        }
+      }
+    },
     "Choose…" : {
       "localizations" : {
         "ja" : {
@@ -253,6 +269,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "다크 아이콘"
+          }
+        }
+      }
+    },
+    "Download from macOSicons…" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOSiconsからダウンロード…"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOSicons에서 다운로드…"
           }
         }
       }

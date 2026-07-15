@@ -82,6 +82,8 @@ All user-facing strings belong in `Resources/Localizable.xcstrings`. English is 
 
 Add English, Korean, and Japanese text together. Keep the terms Light and Dark consistent with the existing translations: `라이트`/`다크` in Korean and `ライト`/`ダーク` in Japanese. If a new language is added, also update `defaultKnownRegions` in `Project.swift` and the three user README files as appropriate.
 
+`macOSicons` is a proper name and keeps this exact spelling in every localization.
+
 The command-line app build compiles the catalog with `xcstringstool`. English uses the source strings and `CFBundleDevelopmentRegion`; translated `ko.lproj` and `ja.lproj` resources are included in the app bundle.
 
 ## Before submitting a change

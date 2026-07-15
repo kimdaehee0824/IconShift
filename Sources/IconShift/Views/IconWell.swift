@@ -78,7 +78,10 @@ struct IconWell: View {
 
     private var controls: some View {
         HStack {
-            Button("Choose…") { choosePanel() }
+            Menu("Choose…") {
+                Button("Choose File…") { choosePanel() }
+                Link("Download from macOSicons…", destination: URL(string: "https://macosicons.com")!)
+            }
             if image != nil {
                 Button(role: .destructive) { onClear() } label: {
                     Image(systemName: "trash")
