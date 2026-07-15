@@ -45,7 +45,7 @@ struct MainView: View {
                 }
             }
         }
-        .frame(minWidth: 760, idealWidth: 880, minHeight: 460, idealHeight: 560)
+        .frame(minWidth: 760, idealWidth: 880, minHeight: 500, idealHeight: 560)
         .onAppear {
             if selection == nil { selection = model.rules.first?.id }
         }
