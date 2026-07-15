@@ -1,17 +1,17 @@
 # IconShift
 
-> You can view the document in different languages: [English](README.md), [한국어](README_ko.md), [日本語](README_jp.md)
+<p align="center">English · <a href="README_ko.md">한국어</a> · <a href="README_jp.md">日本語</a></p>
 
-**IconShift** is a small macOS menu bar app that **swaps app icons to match Light and Dark Mode**. Assign each app one icon per appearance, and IconShift keeps its Finder and Dock icon in sync whenever the system appearance changes.
+Turn on Dark Mode and everything on your Mac goes dark. Except that one icon. **IconShift** is a small menu bar app for exactly that icon: assign each app a Light icon and a Dark icon, and it keeps Finder and Dock in sync whenever the system appearance changes.
 
-It is especially handy for Safari and Chrome web apps, whose icons are usually drawn for a single background and end up clashing with the other mode.
+The usual culprit is a Safari or Chrome web app: its icon was drawn for one background and clashes with the other.
 
 - **Automatic switching**: Applies the matching Light or Dark icon the moment the system appearance changes
 - **Per-app control**: Follow the system, or pin an app to Always Light or Always Dark
 - **Simple setup**: Drop a PNG or ICNS file onto each icon slot, or pick one from a file dialog
 - **Launch at login**: Starts quietly in the background and keeps icons in sync
 - **Optional menu bar icon**: Hide it entirely; IconShift keeps working in the background
-- **Self-healing**: Reapplies your icons at every launch, restoring ones reset by a browser update
+- **Self-healing**: Browser updates reset web app icons now and then; IconShift puts them back at every launch
 
 ## Requirements
 
@@ -41,6 +41,8 @@ Until releases are notarized, macOS may ask for these approvals again after you 
 Open **Settings > General** to toggle **Launch at Login** and **Show Menu Bar Icon**. With the menu bar icon hidden, IconShift keeps running in the background; launch it again from the Applications folder to bring the window back. **Settings > About** shows the version and license.
 
 Finder picks up icon changes immediately. An app that is already running keeps its old Dock tile until you quit and reopen it, which is normal macOS behavior. IconShift also reapplies your icons every time it starts, so web app icons reset by a Safari or Chrome update come back on their own.
+
+Need more icon files? You can download PNG or ICNS icons from [macOSicons](https://macosicons.com), then drag them into IconShift or select them with **Choose…**. IconShift is not affiliated with macOSicons and does not use its API; icon availability and licensing are handled by macOSicons and the respective creators.
 
 ## Contributing
 
