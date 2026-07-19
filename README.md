@@ -1,4 +1,9 @@
-# IconShift
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/banner-dark.jpg">
+    <img src="docs/images/banner-light.jpg" alt="IconShift" width="100%">
+  </picture>
+</p>
 
 <p align="center">English · <a href="README_ko.md">한국어</a> · <a href="README_jp.md">日本語</a></p>
 
