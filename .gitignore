@@ -26,8 +26,9 @@ Derived/
 .tuist/
 Tuist/.build/
 
-# Claude Code local project guide (not part of the public project)
+# Local agent guides (not part of the public project)
 CLAUDE.md
+AGENTS.md
 
 # OMC operational state (not part of the project)
 .omc/
