@@ -7,10 +7,12 @@ struct SidebarView: View {
     @State private var searchText = ""
 
     private var filteredRules: [AppIconRule] {
-        guard !searchText.isEmpty else { return model.rules }
-        return model.rules.filter {
+        let matches = searchText.isEmpty ? model.rules : model.rules.filter {
             $0.displayName.localizedCaseInsensitiveContains(searchText) ||
             $0.appPath.localizedCaseInsensitiveContains(searchText)
+        }
+        return matches.sorted {
+            $0.displayName.localizedStandardCompare($1.displayName) == .orderedAscending
         }
     }
 
