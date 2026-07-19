@@ -12,9 +12,11 @@ let project = Project(
             deploymentTargets: .macOS("14.0"),
             infoPlist: .file(path: "Resources/Info.plist"),
             sources: ["Sources/IconShift/**"],
-            resources: ["Resources/Localizable.xcstrings"],
+            resources: ["Resources/Localizable.xcstrings", "Resources/IconShift.icon"],
             dependencies: [],
             settings: .settings(base: [
+                // actool compiles only the icon matching this name, and still succeeds when it finds none.
+                "ASSETCATALOG_COMPILER_APPICON_NAME": "IconShift",
                 "CODE_SIGN_STYLE": "Manual",
                 "CODE_SIGN_IDENTITY": "-",
                 "MARKETING_VERSION": "0.1.0",

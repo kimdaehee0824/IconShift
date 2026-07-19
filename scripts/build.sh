@@ -40,6 +40,24 @@ cp "$ROOT/Resources/Info.plist" "$APP/Contents/Info.plist"
 xcrun xcstringstool compile "$ROOT/Resources/Localizable.xcstrings" \
     -o "$APP/Contents/Resources"
 
+# The Icon Composer bundle needs actool; swift build never invokes it. --app-icon must match
+# the .icon filename, or actool emits an empty catalog and still exits 0.
+echo "==> Compiling app icon"
+ICON_PARTIAL="$DIST/icon-info.plist"
+xcrun actool "$ROOT/Resources/$APP_NAME.icon" \
+    --compile "$APP/Contents/Resources" \
+    --app-icon "$APP_NAME" \
+    --output-partial-info-plist "$ICON_PARTIAL" \
+    --platform macosx --target-device mac \
+    --minimum-deployment-target 14.0 \
+    --output-format human-readable-text
+# Xcode merges actool's partial plist automatically; a hand-assembled bundle must do it here.
+for key in CFBundleIconFile CFBundleIconName; do
+    value="$(/usr/libexec/PlistBuddy -c "Print :$key" "$ICON_PARTIAL")"
+    /usr/libexec/PlistBuddy -c "Add :$key string $value" "$APP/Contents/Info.plist"
+done
+rm -f "$ICON_PARTIAL"
+
 IDENTITY="${ICONSHIFT_SIGN_ID:-}"
 if [[ -z "$IDENTITY" ]]; then
     if security find-identity -v -p codesigning 2>/dev/null | grep -q "IconShift Self-Signed"; then
