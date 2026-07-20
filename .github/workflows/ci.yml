@@ -38,3 +38,9 @@ jobs:
           [[ " $ARCHS " == *" arm64 "* ]]
           [[ " $ARCHS " == *" x86_64 "* ]]
           codesign --verify --strict --verbose=2 "$APP"
+
+      - name: Build disk image
+        run: |
+          set -euo pipefail
+          scripts/make-dmg.sh
+          test -s dist/IconShift-*.dmg

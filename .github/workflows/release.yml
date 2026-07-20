@@ -70,18 +70,25 @@ jobs:
           [[ " $ARCHS " == *" x86_64 "* ]]
           codesign --verify --strict --verbose=2 "$APP"
 
-      - name: Create release archive
-        run: ditto -c -k --keepParent dist/IconShift.app "IconShift-$RELEASE_TAG.zip"
+      - name: Create release disk image
+        run: |
+          set -euo pipefail
+          scripts/make-dmg.sh
+          test -s "dist/IconShift-$RELEASE_TAG.dmg"
 
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          ARCHIVE="IconShift-$RELEASE_TAG.zip"
+          ARCHIVE="dist/IconShift-$RELEASE_TAG.dmg"
+          # Version-independent copy so releases/latest/download/IconShift.dmg
+          # stays a permanent direct-download link (used by the README badge).
+          LATEST="dist/IconShift.dmg"
+          cp "$ARCHIVE" "$LATEST"
 
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" "$ARCHIVE" --clobber
+            gh release upload "$RELEASE_TAG" "$ARCHIVE" "$LATEST" --clobber
           else
-            gh release create "$RELEASE_TAG" "$ARCHIVE" --generate-notes --verify-tag
+            gh release create "$RELEASE_TAG" "$ARCHIVE" "$LATEST" --generate-notes --verify-tag
           fi

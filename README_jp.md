@@ -29,8 +29,8 @@ IconShiftを使うためにXcodeや開発者ツールを用意する必要はあ
 
 ## インストール
 
-1. [GitHub Releases](https://github.com/kimdaehee0824/IconShift/releases)から最新の`IconShift-<バージョン>.zip`をダウンロードします。
-2. ZIPを展開し、`IconShift.app`を「アプリケーション」フォルダに移動します。
+1. [GitHub Releases](https://github.com/kimdaehee0824/IconShift/releases)から最新の`IconShift-<バージョン>.dmg`をダウンロードします。
+2. DMGを開き、`IconShift.app`を「アプリケーション」フォルダにドラッグします。
 3. IconShiftを一度開きます。まだ公証（ノータリゼーション）されていないリリースのため、macOSが初回起動をブロックすることがあります。その場合は**システム設定 > プライバシーとセキュリティ**を開き、**セキュリティ**で**このまま開く**をクリックしてから、**開く**で確認します。
 4. IconShiftが初めてアプリアイコンを変更するとき、macOSが**アプリ管理**へのアクセス許可を求めます。**許可**をクリックしてください。通知を閉じてしまった場合は、**システム設定 > プライバシーとセキュリティ > アプリ管理**でIconShiftを有効にします。
 

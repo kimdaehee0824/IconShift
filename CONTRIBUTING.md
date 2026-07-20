@@ -26,11 +26,12 @@ swift build
 
 ## Build the app bundle
 
-`scripts/build.sh` builds arm64 and x86_64 executables, combines them into a Universal Binary, compiles the localization catalog, assembles `dist/IconShift.app`, and signs it.
+`scripts/build.sh` builds arm64 and x86_64 executables, combines them into a Universal Binary, compiles the localization catalog and the Icon Composer app icon, assembles `dist/IconShift.app`, and signs it. `scripts/make-dmg.sh` then packages the built app into a distributable disk image with an Applications shortcut and a volume icon.
 
 ```bash
 scripts/build.sh
 scripts/build.sh debug
+scripts/make-dmg.sh
 ```
 
 The script uses `ICONSHIFT_SIGN_ID` when set, then looks for an `IconShift Self-Signed` identity, and otherwise falls back to ad-hoc signing.
@@ -68,10 +69,11 @@ Sources/IconShift/
 Resources/
   Info.plist
   Localizable.xcstrings
+  IconShift.icon                      Icon Composer app icon
 .github/workflows/
-  ci.yml                              Compile and app-bundle validation
-  release.yml                         Version-tagged GitHub Releases
-scripts/                              App assembly and signing helpers
+  ci.yml                              Compile, app-bundle, and disk-image validation
+  release.yml                         Version-tagged GitHub Releases (DMG)
+scripts/                              App assembly, disk-image, and signing helpers
 Project.swift                         Tuist manifest
 Package.swift                         Swift Package Manager manifest
 ```
