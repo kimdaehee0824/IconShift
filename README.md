@@ -7,6 +7,10 @@
 
 <p align="center">English · <a href="README_ko.md">한국어</a> · <a href="README_jp.md">日本語</a></p>
 
+<p align="center">
+  <a href="https://github.com/kimdaehee0824/IconShift/releases/latest/download/IconShift.dmg"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/download-dark.svg"><img src="docs/images/download-light.svg" height="14" alt=""></picture> <b>Download for macOS</b></a> · macOS 14+ · Universal
+</p>
+
 Turn on Dark Mode and everything on your Mac goes dark. Except that one icon. **IconShift** is a small menu bar app for exactly that icon: assign each app a Light icon and a Dark icon, and it keeps Finder and Dock in sync whenever the system appearance changes.
 
 The usual culprit is a Safari or Chrome web app: its icon was drawn for one background and clashes with the other.
