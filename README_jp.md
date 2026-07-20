@@ -5,11 +5,7 @@
   </picture>
 </p>
 
-<p align="center"><a href="README.md">English</a> · <a href="README_ko.md">한국어</a> · 日本語</p>
-
-<p align="center">
-  <a href="https://github.com/kimdaehee0824/IconShift/releases/latest/download/IconShift.dmg"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/download-dark.svg"><img src="docs/images/download-light.svg" height="14" alt=""></picture> <b>macOS版をダウンロード</b></a> · macOS 14+ · Universal
-</p>
+<p align="center"><a href="README.md">English</a> · <a href="README_ko.md">한국어</a> · 日本語 · <a href="https://github.com/kimdaehee0824/IconShift/releases/latest/download/IconShift.dmg"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/download-dark.svg"><img src="docs/images/download-light.svg" height="14" alt=""></picture> <b>macOS版をダウンロード</b></a></p>
 
 ダークモードをオンにすると、Macのすべてが暗くなります。あのアイコンひとつを除いて。**IconShift**は、まさにそのアイコンのための小さなメニューバーアプリです。アプリごとにライト用・ダーク用のアイコンを1つずつ指定しておくと、システムの外観が変わるたびにFinderとDockのアイコンも切り替わります。
 

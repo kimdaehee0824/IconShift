@@ -5,11 +5,7 @@
   </picture>
 </p>
 
-<p align="center"><a href="README.md">English</a> · 한국어 · <a href="README_jp.md">日本語</a></p>
-
-<p align="center">
-  <a href="https://github.com/kimdaehee0824/IconShift/releases/latest/download/IconShift.dmg"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/download-dark.svg"><img src="docs/images/download-light.svg" height="14" alt=""></picture> <b>macOS용 다운로드</b></a> · macOS 14+ · Universal
-</p>
+<p align="center"><a href="README.md">English</a> · 한국어 · <a href="README_jp.md">日本語</a> · <a href="https://github.com/kimdaehee0824/IconShift/releases/latest/download/IconShift.dmg"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/download-dark.svg"><img src="docs/images/download-light.svg" height="14" alt=""></picture> <b>macOS용 다운로드</b></a></p>
 
 다크 모드를 켜면 Mac의 모든 것이 어두워집니다. 딱 그 아이콘 하나만 빼고요. **IconShift**는 바로 그 아이콘을 위한 작은 메뉴 막대 앱입니다. 앱마다 라이트·다크 아이콘을 하나씩 지정해 두면, 시스템 외형이 바뀔 때마다 Finder와 Dock의 아이콘도 알맞게 바뀝니다.
 
