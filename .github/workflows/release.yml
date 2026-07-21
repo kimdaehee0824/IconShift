@@ -40,17 +40,63 @@ jobs:
           git ls-remote --exit-code --tags origin "refs/tags/$RELEASE_TAG" >/dev/null
 
           PROJECT_VERSION="$(sed -n 's/.*"MARKETING_VERSION": "\([^"]*\)".*/\1/p' Project.swift)"
+          PROJECT_BUILD="$(sed -n 's/.*"CURRENT_PROJECT_VERSION": "\([^"]*\)".*/\1/p' Project.swift)"
           INFO_VERSION="$(plutil -extract CFBundleShortVersionString raw Resources/Info.plist)"
+          # Sparkle compares CFBundleVersion, so it must move with every release.
+          INFO_BUILD="$(plutil -extract CFBundleVersion raw Resources/Info.plist)"
 
-          if [[ "$PROJECT_VERSION" != "$RELEASE_TAG" || "$INFO_VERSION" != "$RELEASE_TAG" ]]; then
-            echo "Version mismatch: tag=$RELEASE_TAG Project.swift=$PROJECT_VERSION Info.plist=$INFO_VERSION" >&2
+          if [[ "$PROJECT_VERSION" != "$RELEASE_TAG" || "$PROJECT_BUILD" != "$RELEASE_TAG" ||
+                "$INFO_VERSION" != "$RELEASE_TAG" || "$INFO_BUILD" != "$RELEASE_TAG" ]]; then
+            echo "Version mismatch: tag=$RELEASE_TAG Project.swift=$PROJECT_VERSION/$PROJECT_BUILD Info.plist=$INFO_VERSION/$INFO_BUILD" >&2
             exit 1
           fi
 
-      # Replace ad-hoc signing with Developer ID signing and notarization here after configuring secrets.
+      - name: Validate signing secrets
+        env:
+          DEVELOPER_ID_IDENTITY: ${{ secrets.DEVELOPER_ID_IDENTITY }}
+          DEVELOPER_ID_CERT_P12: ${{ secrets.DEVELOPER_ID_CERT_P12 }}
+          DEVELOPER_ID_CERT_PASSWORD: ${{ secrets.DEVELOPER_ID_CERT_PASSWORD }}
+          NOTARY_KEY_P8: ${{ secrets.NOTARY_KEY_P8 }}
+          NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
+          NOTARY_ISSUER_ID: ${{ secrets.NOTARY_ISSUER_ID }}
+          SPARKLE_ED_PRIVATE_KEY: ${{ secrets.SPARKLE_ED_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          missing=()
+          for name in DEVELOPER_ID_IDENTITY DEVELOPER_ID_CERT_P12 DEVELOPER_ID_CERT_PASSWORD \
+                      NOTARY_KEY_P8 NOTARY_KEY_ID NOTARY_ISSUER_ID SPARKLE_ED_PRIVATE_KEY; do
+            [[ -n "${!name}" ]] || missing+=("$name")
+          done
+          if (( ${#missing[@]} )); then
+            echo "Missing repository secrets: ${missing[*]}" >&2
+            echo "Releases are Developer ID signed and notarized; see CONTRIBUTING.md for setup." >&2
+            exit 1
+          fi
+
+      - uses: jdx/mise-action@v2
+
+      - name: Import Developer ID certificate
+        env:
+          CERT_P12_BASE64: ${{ secrets.DEVELOPER_ID_CERT_P12 }}
+          CERT_PASSWORD: ${{ secrets.DEVELOPER_ID_CERT_PASSWORD }}
+        run: |
+          set -euo pipefail
+          KEYCHAIN="$RUNNER_TEMP/release.keychain-db"
+          KEYCHAIN_PASSWORD="$(uuidgen)"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          echo "$CERT_P12_BASE64" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" -P "$CERT_PASSWORD" \
+            -f pkcs12 -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: \
+            -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" >/dev/null
+          security list-keychains -d user -s "$KEYCHAIN" login.keychain-db
+          rm "$RUNNER_TEMP/cert.p12"
+
       - name: Build release app
         env:
-          ICONSHIFT_SIGN_ID: "-"
+          ICONSHIFT_SIGN_ID: ${{ secrets.DEVELOPER_ID_IDENTITY }}
         run: scripts/build.sh release
 
       - name: Verify release app
@@ -69,12 +115,57 @@ jobs:
           [[ " $ARCHS " == *" arm64 "* ]]
           [[ " $ARCHS " == *" x86_64 "* ]]
           codesign --verify --strict --verbose=2 "$APP"
+          codesign -d --verbose=2 "$APP" 2>&1 | grep -q "Authority=Developer ID Application"
+          codesign -d --verbose=2 "$APP" 2>&1 | grep -q "flags=.*runtime"
+
+      - name: Notarize and staple app
+        env:
+          NOTARY_KEY_P8: ${{ secrets.NOTARY_KEY_P8 }}
+          NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
+          NOTARY_ISSUER_ID: ${{ secrets.NOTARY_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          echo "$NOTARY_KEY_P8" > "$RUNNER_TEMP/notary.p8"
+          NOTARY_KEY_FILE="$RUNNER_TEMP/notary.p8" scripts/notarize.sh dist/IconShift.app
+          spctl --assess --type execute --verbose=2 dist/IconShift.app
 
       - name: Create release disk image
         run: |
           set -euo pipefail
           scripts/make-dmg.sh
           test -s "dist/IconShift-$RELEASE_TAG.dmg"
+
+      - name: Sign, notarize, and staple disk image
+        env:
+          IDENTITY: ${{ secrets.DEVELOPER_ID_IDENTITY }}
+          NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
+          NOTARY_ISSUER_ID: ${{ secrets.NOTARY_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          DMG="dist/IconShift-$RELEASE_TAG.dmg"
+          codesign --force --timestamp --sign "$IDENTITY" "$DMG"
+          NOTARY_KEY_FILE="$RUNNER_TEMP/notary.p8" scripts/notarize.sh "$DMG"
+          spctl --assess --type open --context context:primary-signature --verbose=2 "$DMG"
+
+      - name: Generate Sparkle appcast
+        env:
+          SPARKLE_ED_PRIVATE_KEY: ${{ secrets.SPARKLE_ED_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          SPARKLE_VERSION="2.9.4"
+          curl -fsSL -o "$RUNNER_TEMP/sparkle.tar.xz" \
+            "https://github.com/sparkle-project/Sparkle/releases/download/$SPARKLE_VERSION/Sparkle-$SPARKLE_VERSION.tar.xz"
+          mkdir -p "$RUNNER_TEMP/sparkle-tools" "$RUNNER_TEMP/appcast"
+          tar -xJf "$RUNNER_TEMP/sparkle.tar.xz" -C "$RUNNER_TEMP/sparkle-tools" bin/generate_appcast
+          cp "dist/IconShift-$RELEASE_TAG.dmg" "$RUNNER_TEMP/appcast/"
+          printf '%s' "$SPARKLE_ED_PRIVATE_KEY" > "$RUNNER_TEMP/sparkle_ed.key"
+          "$RUNNER_TEMP/sparkle-tools/bin/generate_appcast" \
+            --ed-key-file "$RUNNER_TEMP/sparkle_ed.key" \
+            --download-url-prefix "https://github.com/$GITHUB_REPOSITORY/releases/download/$RELEASE_TAG/" \
+            -o dist/appcast.xml "$RUNNER_TEMP/appcast"
+          rm "$RUNNER_TEMP/sparkle_ed.key"
+          grep -q "sparkle:edSignature" dist/appcast.xml
+          cat dist/appcast.xml
 
       - name: Publish GitHub Release
         env:
@@ -88,7 +179,7 @@ jobs:
           cp "$ARCHIVE" "$LATEST"
 
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" "$ARCHIVE" "$LATEST" --clobber
+            gh release upload "$RELEASE_TAG" "$ARCHIVE" "$LATEST" dist/appcast.xml --clobber
           else
-            gh release create "$RELEASE_TAG" "$ARCHIVE" "$LATEST" --generate-notes --verify-tag
+            gh release create "$RELEASE_TAG" "$ARCHIVE" "$LATEST" dist/appcast.xml --generate-notes --verify-tag
           fi

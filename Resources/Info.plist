@@ -10,8 +10,9 @@
     <string>en</string>
     <key>CFBundleIdentifier</key>
     <string>com.iconshift.IconShift</string>
+    <!-- Sparkle compares CFBundleVersion, so it moves in lockstep with the marketing version. -->
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>0.1.0</string>
     <key>CFBundleShortVersionString</key>
     <string>0.1.0</string>
     <key>CFBundleExecutable</key>
@@ -20,6 +21,8 @@
     <string>APPL</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.utilities</string>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
     <key>NSHumanReadableCopyright</key>
@@ -27,5 +30,9 @@
     <!-- Menu-bar / background agent: no Dock icon by default. -->
     <key>LSUIElement</key>
     <true/>
+    <key>SUFeedURL</key>
+    <string>https://github.com/kimdaehee0824/IconShift/releases/latest/download/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>X36C7eFYtoa1vUvdJnmbZWUNX8XMjlmFbsab7wIVz60=</string>
 </dict>
 </plist>

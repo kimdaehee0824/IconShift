@@ -31,10 +31,10 @@ You do not need Xcode or any developer tools to use IconShift.
 
 1. Download the latest `IconShift-<version>.dmg` from [GitHub Releases](https://github.com/kimdaehee0824/IconShift/releases).
 2. Open it and drag `IconShift.app` into the Applications folder.
-3. Open IconShift once. Releases are not notarized yet, so macOS may block the first launch. If it does, go to **System Settings > Privacy & Security**, scroll down to **Security**, click **Open Anyway**, then confirm with **Open**.
+3. Open IconShift. Releases are signed and notarized, so the first launch opens like any other app.
 4. The first time IconShift changes an app icon, macOS asks for **App Management** access. Click **Allow**. If you missed the prompt, enable IconShift under **System Settings > Privacy & Security > App Management**.
 
-Until releases are notarized, macOS may ask for these approvals again after you update IconShift.
+The App Management approval carries over when you update IconShift.
 
 ## Usage
 

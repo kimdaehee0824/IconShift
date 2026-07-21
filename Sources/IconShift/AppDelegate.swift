@@ -1,15 +1,19 @@
 import AppKit
+import Sparkle
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let model = AppModel()
+    private let updaterController = SPUStandardUpdaterController(
+        startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil
+    )
     private var statusController: StatusItemController?
     private var windowController: MainWindowController?
     private var settingsController: SettingsWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
-        MainMenu.install()
+        MainMenu.install(updater: updaterController)
 
         model.refreshLoginItemStatus()
 
@@ -24,6 +28,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let statusController = StatusItemController(
             model: model,
+            updater: updaterController,
             onOpen: { [weak windowController] in windowController?.show() },
             onOpenSettings: { [weak self] in self?.showSettings(nil) }
         )

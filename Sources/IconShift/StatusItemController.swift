@@ -1,14 +1,20 @@
 import AppKit
+import Sparkle
 
 @MainActor
 final class StatusItemController: NSObject, NSMenuDelegate {
     private let model: AppModel
+    private let updater: SPUStandardUpdaterController
     private let onOpen: () -> Void
     private let onOpenSettings: () -> Void
     private var statusItem: NSStatusItem?
 
-    init(model: AppModel, onOpen: @escaping () -> Void, onOpenSettings: @escaping () -> Void) {
+    init(model: AppModel,
+         updater: SPUStandardUpdaterController,
+         onOpen: @escaping () -> Void,
+         onOpenSettings: @escaping () -> Void) {
         self.model = model
+        self.updater = updater
         self.onOpen = onOpen
         self.onOpenSettings = onOpenSettings
         super.init()
@@ -47,6 +53,11 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
 
         addItem(to: menu, title: NSLocalizedString("Settings…", comment: ""), action: #selector(openSettings), key: ",")
+        let checkForUpdates = NSMenuItem(title: NSLocalizedString("Check for Updates…", comment: ""),
+                                         action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)),
+                                         keyEquivalent: "")
+        checkForUpdates.target = updater
+        menu.addItem(checkForUpdates)
         menu.addItem(.separator())
         addItem(to: menu, title: NSLocalizedString("Quit IconShift", comment: ""), action: #selector(quit), key: "q")
     }

@@ -1,14 +1,19 @@
 import AppKit
+import Sparkle
 
 @MainActor
 enum MainMenu {
-    static func install() {
+    static func install(updater: SPUStandardUpdaterController) {
         let appName = "IconShift"
 
         let appMenu = NSMenu()
         appMenu.addItem(withTitle: String(format: NSLocalizedString("About %@", comment: ""), appName),
                         action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)),
                         keyEquivalent: "")
+        let checkForUpdates = appMenu.addItem(withTitle: NSLocalizedString("Check for Updates…", comment: ""),
+                                              action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)),
+                                              keyEquivalent: "")
+        checkForUpdates.target = updater
         appMenu.addItem(.separator())
         appMenu.addItem(withTitle: NSLocalizedString("Settings…", comment: ""),
                         action: #selector(AppDelegate.showSettings(_:)),

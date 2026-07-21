@@ -1,6 +1,6 @@
 # Contributing to IconShift
 
-Thank you for helping improve IconShift. The project is intentionally small, dependency-free, and focused on reliable icon switching for macOS.
+Thank you for helping improve IconShift. The project is intentionally small and focused on reliable icon switching for macOS. Sparkle, which powers automatic updates, is the only third-party dependency.
 
 ## Requirements
 
@@ -26,7 +26,7 @@ swift build
 
 ## Build the app bundle
 
-`scripts/build.sh` builds arm64 and x86_64 executables, combines them into a Universal Binary, compiles the localization catalog and the Icon Composer app icon, assembles `dist/IconShift.app`, and signs it. `scripts/make-dmg.sh` then packages the built app into a distributable disk image with an Applications shortcut and a volume icon.
+`scripts/build.sh` generates the Xcode workspace with Tuist, archives a Universal build with `xcodebuild`, and stages `dist/IconShift.app`. Xcode compiles the localization catalog and the Icon Composer app icon as part of the build. `scripts/make-dmg.sh` then packages the built app into a distributable disk image with an Applications shortcut and a volume icon.
 
 ```bash
 scripts/build.sh
@@ -34,7 +34,7 @@ scripts/build.sh debug
 scripts/make-dmg.sh
 ```
 
-The script uses `ICONSHIFT_SIGN_ID` when set, then looks for an `IconShift Self-Signed` identity, and otherwise falls back to ad-hoc signing.
+The script uses `ICONSHIFT_SIGN_ID` when set, then looks for an `IconShift Self-Signed` identity, and otherwise falls back to ad-hoc signing. When `ICONSHIFT_SIGN_ID` is a `Developer ID Application` identity, the build switches to `xcodebuild -exportArchive` with the developer-id method, which produces the hardened-runtime, timestamped signature that notarization requires.
 
 For a stable local identity, run:
 
@@ -43,6 +43,24 @@ scripts/make-signing-cert.sh
 ```
 
 Use the resulting `IconShift Self-Signed` identity in Xcode or the build script. App Management associates its grant with the app's code identity, so a stable signature keeps the permission across rebuilds. An ad-hoc signature changes with the binary and can require permission again.
+
+## Release signing and notarization
+
+Tagged releases are Developer ID signed, notarized, and stapled in CI (`.github/workflows/release.yml`). The workflow fails early unless six repository secrets are configured:
+
+| Secret | Value |
+| --- | --- |
+| `DEVELOPER_ID_IDENTITY` | Full identity string, e.g. `Developer ID Application: Name (TEAMID)` |
+| `DEVELOPER_ID_CERT_P12` | Certificate + private key export, base64-encoded (`base64 -i cert.p12`) |
+| `DEVELOPER_ID_CERT_PASSWORD` | Password of the `.p12` export |
+| `NOTARY_KEY_P8` | Contents of the App Store Connect team API key (`.p8`) |
+| `NOTARY_KEY_ID` | Key ID of that API key |
+| `NOTARY_ISSUER_ID` | Issuer ID shown on the team keys page |
+| `SPARKLE_ED_PRIVATE_KEY` | Sparkle EdDSA private key (`generate_keys -x`) used to sign the appcast |
+
+Two Apple-side constraints: only the account holder of the Apple Developer membership can create the Developer ID Application certificate, and the notary API key must be a team key with the Developer role or higher (personal keys are rejected by the notary service). `scripts/notarize.sh` submits a build with `notarytool`, prints the notary log when a submission is not accepted, and staples the ticket.
+
+The workflow also generates a Sparkle `appcast.xml`, signed with the EdDSA key, and uploads it as a release asset; the app's `SUFeedURL` points at `releases/latest/download/appcast.xml`. A release tag must match four values: `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in `Project.swift`, and `CFBundleShortVersionString` and `CFBundleVersion` in `Resources/Info.plist` — Sparkle compares `CFBundleVersion`, so it moves with every release.
 
 ## How it works
 
@@ -72,7 +90,7 @@ Resources/
   IconShift.icon                      Icon Composer app icon
 .github/workflows/
   ci.yml                              Compile, app-bundle, and disk-image validation
-  release.yml                         Version-tagged GitHub Releases (DMG)
+  release.yml                         Signed, notarized, version-tagged GitHub Releases (DMG)
 scripts/                              App assembly, disk-image, and signing helpers
 Project.swift                         Tuist manifest
 Package.swift                         Swift Package Manager manifest
@@ -86,10 +104,10 @@ Add English, Korean, and Japanese text together. Keep the terms Light and Dark c
 
 `macOSicons` is a proper name and keeps this exact spelling in every localization.
 
-The command-line app build compiles the catalog with `xcstringstool`. English uses the source strings and `CFBundleDevelopmentRegion`; translated `ko.lproj` and `ja.lproj` resources are included in the app bundle.
+Xcode compiles the catalog during the build. English uses the source strings and `CFBundleDevelopmentRegion`; translated `ko.lproj` and `ja.lproj` resources are included in the app bundle.
 
 ## Before submitting a change
 
 Run `swift build` and `scripts/build.sh`. For icon application changes, also verify the result in Finder and inspect `~/Library/Application Support/IconShift/iconshift.log`. Keep `README.md`, `README_ko.md`, and `README_jp.md` synchronized when user documentation changes.
 
-Please avoid adding third-party dependencies unless there is a compelling reason that cannot be handled clearly with system frameworks.
+Please avoid adding third-party dependencies beyond Sparkle unless there is a compelling reason that cannot be handled clearly with system frameworks.
